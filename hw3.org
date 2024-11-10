@@ -60,9 +60,9 @@ far we can get.
 
 ** Group Members
 
-| first name last name | color                         |
-|----------------------+-------------------------------|
-|                      | green \color{green}\rule{5mm}{3mm} |
+| first name last name | color                                |
+|----------------------+--------------------------------------|
+| Huzaifa Khan         | green \color{green}\rule{5mm}{3mm}   |
 |                      | yellow \color{yellow}\rule{5mm}{3mm} |
 |                      | purple \color{violet}\rule{5mm}{3mm} |
 
@@ -167,6 +167,54 @@ really desirable for problem 4.
    (that requires hand-checking by expert grammarians).  Save these somehow
    so you can re-use them in the [[fea-set][next]] problem.
 
+#+BEGIN_SRC python :results output
+import pandas as pd
+import nltk
+from nltk.corpus import gutenberg, stopwords
+from nltk import pos_tag
+from nltk.data import load
+
+import random
+from sklearn.model_selection import train_test_split
+
+# UNCOMMENT THESE TO DOWNLOAD NLTK CONTENT AS NECESSARY -----------------------------------------
+# nltk.download('gutenberg')
+# nltk.download('stopwords')
+# nltk.download('averaged_perceptron_tagger_eng')
+# nltk.download('universal_tagset')
+
+# gets the set of stopwords
+sws = set(stopwords.words("english")) 
+
+set_of_words = set() # stores unique words
+
+for fileid in gutenberg.fileids():
+    for word in gutenberg.words(fileid):
+        if word.isalpha() and len(word) > 3 and word.lower() not in sws:
+            set_of_words.add(word.lower())
+
+# print(set_of_words)
+
+oneK_words = random.sample(list(set_of_words), 1000)
+
+tagged_words = pos_tag(oneK_words, tagset='universal')
+
+train_set, test_set = train_test_split(tagged_words, test_size=0.1, random_state=42)
+
+print(f"The test set has {len(test_set)} entries, and the training set has {len(train_set)} entries")
+
+train_df = pd.DataFrame(train_set, columns=['Word', 'POS'])
+test_df = pd.DataFrame(test_set, columns=['Word', 'POS'])
+train_df.to_csv("hw3_train_set.csv", index=False)
+test_df.to_csv("hw3_test_set.csv", index=False)
+
+print("train and test set stored as csv")
+  
+#+END_SRC
+
+#+RESULTS:
+: The test set has 100 entries, and the training set has 900 entries
+: train and test set stored as csv
 
 
 2. [@2] <<fea-set>> For each of tuples in your training set in problem
