@@ -63,8 +63,8 @@ far we can get.
 | first name last name | color                                |
 |----------------------+--------------------------------------|
 | Huzaifa Khan         | green \color{green}\rule{5mm}{3mm}   |
-|                      | yellow \color{yellow}\rule{5mm}{3mm} |
-|                      | purple \color{violet}\rule{5mm}{3mm} |
+| Michael Huber        | yellow \color{yellow}\rule{5mm}{3mm} |
+| Ethan Glass          | purple \color{violet}\rule{5mm}{3mm} |
 
 
 
