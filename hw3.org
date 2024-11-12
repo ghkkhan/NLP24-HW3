@@ -224,6 +224,44 @@ print("train and test set stored as csv")
    feature with 'X'.  Again, save the feature set for reuse as a file, at
    minimum as a dictionary.  *Do the same for the test set.*
 
+#+BEGIN_SRC python 
+import pandas as pd
+
+#using pickle as it saves state of data for future
+import pickle
+
+# Load the training and test sets
+train_df = pd.read_csv("hw3_train_set.csv")
+test_df = pd.read_csv("hw3_test_set.csv")
+
+# Helper function to create feature sets with last three letters
+def create_feature_set(df):
+    feature_dict = {}
+    for _, row in df.iterrows():
+        word, pos = row['Word'], row['POS']
+        last_three = word[-3:]  # Get the last three letters
+        
+        # Check if last_three already exists and has a different tag
+        if last_three in feature_dict and feature_dict[last_three] != pos:
+            feature_dict[last_three] = 'X'  # Mark ambiguous feature
+        else:
+            feature_dict[last_three] = pos
+    return feature_dict
+
+# Create feature sets for training and testing
+train_features = create_feature_set(train_df)
+test_features = create_feature_set(test_df)
+
+# Save feature sets as files
+with open("train_features.pkl", "wb") as train_file:
+    pickle.dump(train_features, train_file)
+    
+with open("test_features.pkl", "wb") as test_file:
+    pickle.dump(test_features, test_file)
+
+print("Feature sets saved as pickle files.")
+
+#+END_SRC
 
 3. [@3] <<bayesian>> Now train a naive Bayes classifier using the one in
    NLTK or scikit-learn on your saved [[fea-set][feature set]] and show its accuracy.
