@@ -326,7 +326,60 @@ print("Feature sets saved as pickle files.")
    scikit-learn, or both for this problem: just be sure your code block is
    complete and self-contained.
 
+#+BEGIN_SRC python
 
+import random
+import nltk
+from nltk.corpus import brown
+from nltk.corpus import stopwords
+from collections import Counter
+from sklearn.utils import shuffle
+
+# Ensure necessary downloads
+nltk.download('brown')
+nltk.download('stopwords')
+
+# Load Brown corpus (category news) and remove stop words
+stop_words = set(stopwords.words("english"))
+news_sentences = brown.sents(categories='news')
+
+# Helper function to create bag of significant words
+def significant_words(sentence):
+    return set(word.lower() for word in sentence if word.isalpha() and word.lower() not in stop_words)
+
+# First set of anchor sentences and successors
+random.seed(42)
+first_anchors = random.sample(range(len(news_sentences) - 1), 700)
+baseline_intersections = []
+for i in first_anchors:
+    anchor_bow = significant_words(news_sentences[i])
+    successor_bow = significant_words(news_sentences[i + 1])
+    baseline_intersections.append(len(anchor_bow.intersection(successor_bow)))
+
+# Second set of anchor sentences and successors
+second_anchor_pool = set(range(len(news_sentences) - 1)) - set(first_anchors)
+second_anchors = random.sample(second_anchor_pool, 700)
+control_intersections = []
+for i in second_anchors:
+    anchor_bow = significant_words(news_sentences[i])
+    successor_bow = significant_words(news_sentences[i + 1])
+    control_intersections.append(len(anchor_bow.intersection(successor_bow)))
+
+# Second anchors with permuted successors
+shuffled_sentences = shuffle(news_sentences, random_state=42)
+experiment_intersections = []
+for i in second_anchors:
+    anchor_bow = significant_words(shuffled_sentences[i])
+    successor_bow = significant_words(shuffled_sentences[i + 1])
+    experiment_intersections.append(len(anchor_bow.intersection(successor_bow)))
+
+# Displaying Results
+print("(first anchor + successors):", Counter(baseline_intersections))
+print("(second anchor + successors):", Counter(control_intersections))
+print("(second anchor + new successors):", Counter(experiment_intersections))
+
+
+#+END_SRC
 
 
 # added notes on not relying on default cluster nums and
