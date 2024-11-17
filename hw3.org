@@ -846,7 +846,46 @@ print("(second anchor + new successors):", Counter(exp_intersections))
    you find in the results of the different trials, referencing and
    enclosing your plots.
 
+#+BEGIN_SRC python
+import pickle
+import nltk
+from nltk.corpus import brown
+from sklearn.preprocessing import LabelEncoder
+import random
 
+nltk.download('brown')
+nltk.download('universal_tagset')
+
+brown_sents = list(brown.tagged_sents(categories='news', tagset='universal'))
+
+selected_sents = random.sample(brown_sents, 500)  
+
+chunk_list = []
+
+for sent in selected_sents:
+    nouns_indices = [i for i, (_, tag) in enumerate(sent) if tag == 'NOUN']
+    
+    for noun_index in nouns_indices:
+        if noun_index < 3:
+            continue
+        
+        preceding_tags = [sent[noun_index - 3][1], sent[noun_index - 2][1], sent[noun_index - 1][1]]
+        chunk_list.append(preceding_tags)
+
+label_encoder = LabelEncoder()
+all_tags = [tag for chunk in chunk_list for tag in chunk]
+label_encoder.fit(all_tags)
+
+encoded_chunks = []
+for chunk in chunk_list:
+    encoded_chunks.append(tuple(label_encoder.transform(chunk)))
+
+with open('encoded_chunks.pkl', 'wb') as f:
+    pickle.dump(encoded_chunks, f)
+
+print(f"Encoded chunks saved to disk. Total chunks: {len(encoded_chunks)}")
+
+#+END_SRC
 
 
 
