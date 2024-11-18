@@ -887,7 +887,64 @@ print(f"Encoded chunks saved to disk. Total chunks: {len(encoded_chunks)}")
 
 #+END_SRC
 
+#+RESULTS:
+: None
 
+#+begin_src python :results output
+import pickle
+import numpy as np
+from sklearn.cluster import AgglomerativeClustering
+import matplotlib.pyplot as plt
+
+from sklearn.decomposition import PCA
+
+
+with open('encoded_chunks.pkl', 'rb') as f:
+    data = np.array(pickle.load(f))
+
+# cluster combos
+linkage_metrics = [
+    ("ward", "euclidean"),
+    ("average", "manhattan"),
+    ("average", "cosine")
+]
+
+
+for linkage, metric in linkage_metrics:
+    clustering = AgglomerativeClustering(
+        n_clusters=4,
+        linkage=linkage
+    )
+    label = clustering.fit_predict(data)
+
+    #Added dimension reduction for scatter plot view
+    reducer = PCA(n_components=2)
+    pca_data = reducer.fit_transform(data) 
+
+    plt.figure(figsize=(6,6))
+    plt.scatter(
+        pca_data[:, 0], pca_data[:, 1], 
+        c=label, s=25, alpha=0.8
+    )
+    plt.title(f"Agglomerative Clustering ({linkage} - {metric})")
+    plt.xlabel("DIM 1")
+    plt.ylabel("DIM 2")
+    plt.colorbar(label="Cluster")
+
+    plt.savefig(f"{linkage}-{metric}.png")
+    plt.close()
+  
+#+end_src
+
+#+RESULTS:
+___________________________________________________________________________________________________
+** Agglomerative clustering scatterplot (PCA for dimension reduction)
+[[./ward-euclidean.png]]
+
+[[./average-manhattan.png]]
+
+[[./average-cosine.png]]
+__________________________________________________________________________________________________
 
 * 
 * DONE Grading Scale
