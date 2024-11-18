@@ -847,6 +847,13 @@ print("(second anchor + new successors):", Counter(exp_intersections))
    you find in the results of the different trials, referencing and
    enclosing your plots.
 
+** DISCUSSION
+The Meanshift algorithm produces a variable number of clusterings based on the runtime. 13/14 seem to be the most common ones based on our runs. On the other hand, the agglomerative clustering allows us to select the number of clusters we like. We tried various numbers between 3-10 and stuck with 4 a bit arbitrarily. We visualize the results by plotting the data as a scatterplot. As the scatter plot is 2d, we have to dimension reduce our data, which means that the clustering may not necessarily be as easily differentiated as it might be on a higher-dimension scatter plot.
+
+Based on the tests and the scatter plots, we do see that the data is clustered to some degree. For example, all yellow dots are either top right or at the top. Green tend to be top and middle left, while blue is bottom right on all the agglomerative clustering.
+
+While the clustering is different in the meanshift, we can still see the conglomeration of points fo same color together lke yellow on the right, purple on the left/middle, etc...
+
 #+BEGIN_SRC python
 import pickle
 import nltk
@@ -1007,6 +1014,9 @@ plt.close()
 #+end_src
 
 #+RESULTS:
+: Estimated bandwidth: 1.1592555239714966
+: MeanShift produced 13 clusters
+: Silhouette Score: 0.41
 
 ** MeanShift clustering scatterplot 
 [[./MeanShift Clustering.png]]
