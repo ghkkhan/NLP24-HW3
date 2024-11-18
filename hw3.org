@@ -947,6 +947,38 @@ ________________________________________________________________________________
 __________________________________________________________________________________________________
 
 * 
+#+begin_src python
+
+from sklearn.cluster import MeanShift
+import pickle
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+
+with open('encoded_chunks.pkl', 'rb') as f:
+    data = np.array(pickle.load(f))
+
+clustering = MeanShift()
+labels = clustering.fit_predict(data)
+
+reducer = PCA(n_components=2)
+pca_data = reducer.fit_transform(data)
+
+plt.figure(figsize=(6, 6))
+plt.scatter(
+    pca_data[:, 0], pca_data[:, 1],
+    c=labels, s=25, alpha=0.8
+)
+plt.title("MeanShift Clustering")
+plt.xlabel("DIM 1")
+plt.ylabel("DIM 2")
+plt.colorbar(label="Cluster")
+
+plt.savefig("meanshift-clustering.png")
+plt.close()
+
+#+end_src
+
 * DONE Grading Scale
 
 This homework is worth 15 points. The grading scale is:
