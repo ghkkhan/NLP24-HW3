@@ -948,37 +948,68 @@ ________________________________________________________________________________
 __________________________________________________________________________________________________
 
 * 
-#+begin_src python
+#+begin_src python :results output 
 
-from sklearn.cluster import MeanShift
+from sklearn.cluster import MeanShift, estimate_bandwidth 
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+from sklearn.decomposition import PCA
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
 
+# Loads the data from the pickle file
 with open('encoded_chunks.pkl', 'rb') as f:
     data = np.array(pickle.load(f))
 
-clustering = MeanShift()
-labels = clustering.fit_predict(data)
+# Changes the data so the numbers are all on one same scale, makes it easier to work with as we continue
+scaler = StandardScaler()
+scaledData = scaler.fit_transform(data)
 
+# Gets a good bandwidth to work with for the clustering
+bandwidthChosen = estimate_bandwidth(scaledData, quantile=0.1, n_samples=500)
+print(f"Estimated bandwidth: {bandwidthChosen}")
+
+# Perform MeanShift clustering
+clustersMade = MeanShift(bandwidth=bandwidthChosen)
+graphLabels = clustersMade.fit_predict(scaledData)
+
+# Gets the number of clusters
+numOfClusters = len(np.unique(graphLabels))
+print(f"MeanShift produced {numOfClusters} clusters")
+
+# Gets a score to see if the clusters are good
+if numOfClusters > 1:
+    silhouette = silhouette_score(scaledData, graphLabels)
+    print(f"Silhouette Score: {silhouette:.2f}")
+else:
+    print("Silhouette score cannot be calculated because only one cluster was found.")
+
+# Transforms the data to allow a picture to be made
 reducer = PCA(n_components=2)
-pca_data = reducer.fit_transform(data)
+pca_data = reducer.fit_transform(scaledData)
 
+# Clusters are plotted and output to a png
 plt.figure(figsize=(6, 6))
 plt.scatter(
     pca_data[:, 0], pca_data[:, 1],
-    c=labels, s=25, alpha=0.8
+    c=graphLabels, s=25, alpha=0.8
 )
-plt.title("MeanShift Clustering")
-plt.xlabel("DIM 1")
-plt.ylabel("DIM 2")
+plt.title(f"MeanShift Clustering (Clusters: {numOfClusters})")
+plt.xlabel("PCA Dimension 1")
+plt.ylabel("PCA Dimension 2")
 plt.colorbar(label="Cluster")
 
-plt.savefig("meanshift-clustering.png")
+# Saves picture for later use
+plt.savefig("MeanShift Clustering.png")
 plt.close()
 
 #+end_src
+
+#+RESULTS:
+
+** MeanShift clustering scatterplot 
+[[./MeanShift Clustering.png]]
 
 * DONE Grading Scale
 
