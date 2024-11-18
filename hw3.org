@@ -273,36 +273,37 @@ print("Feature sets saved as pickle files.")
 
 
 #+BEGIN_SRC python :results output
-import pickle
-import nltk
-from nltk.classify import NaiveBayesClassifier
-from nltk.metrics import accuracy
+  import pickle
+  import nltk
+  from nltk.classify import NaiveBayesClassifier
+  from nltk.metrics import accuracy
 
-with open("train_features.pkl", "rb") as train_file:
-    train_features = pickle.load(train_file)
+  with open("train_features.pkl", "rb") as train_file:
+      train_features = pickle.load(train_file)
 
-with open("test_features.pkl", "rb") as test_file:
-    test_features = pickle.load(test_file)
+  with open("test_features.pkl", "rb") as test_file:
+      test_features = pickle.load(test_file)
 
-def extract_features(word):
-    features = {
-        "last_three": word[-3:],
-        "last_two": word[-2:],
-        "first_letter": word[0],
-        "length": len(word)
-    }
-    return features
+  def extract_features(word):
+      features = {
+	  "last_three": word[-3:],
+	  "last_two": word[-2:],
+	  "first_letter": word[0],
+	  "length": len(word)
+      }
+      return features
 
-train_set = [(extract_features(word), pos) for word, pos in train_features.items()]
-test_set = [(extract_features(word), pos) for word, pos in test_features.items()]
+  train_set = [(extract_features(word), pos) for word, pos in train_features.items()]
+  test_set = [(extract_features(word), pos) for word, pos in test_features.items()]
 
-classifier = NaiveBayesClassifier.train(train_set)
+  classifier = NaiveBayesClassifier.train(train_set)
 
-accuracy_score = nltk.classify.accuracy(classifier, test_set)
-print(f"Naive Bayes Classifier Accuracy: {accuracy_score * 100:.2f}%")
+  accuracy_score = nltk.classify.accuracy(classifier, test_set)
+  print(f"Naive Bayes Classifier Accuracy: {accuracy_score * 100:.2f}%")
 
-print("\nTop 10 Most Informative Features:")
-classifier.show_most_informative_features(10)
+  print("\nTop 10 Most Informative Features:")
+  classifier.show_most_informative_features(10)
+
 #+END_SRC
 
 #+RESULTS:
